@@ -4,7 +4,9 @@ import com.intro.spring.dao.UserDao;
 import com.intro.spring.exception.DataProcessingException;
 import com.intro.spring.model.User;
 import java.util.List;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -43,12 +45,26 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<User> getAll() {
         try (Session session = sessionFactory.openSession()) {
-            CriteriaQuery<User> criteriaQuery
+            CriteriaQuery<User> query
                     = session.getCriteriaBuilder().createQuery(User.class);
-            criteriaQuery.from(User.class);
-            return session.createQuery(criteriaQuery).getResultList();
+            query.from(User.class);
+            return session.createQuery(query).getResultList();
         } catch (Exception e) {
             throw new DataProcessingException("There was an error retrieving all users", e);
+        }
+    }
+
+    @Override
+    public User get(Long id) {
+        try (Session session = sessionFactory.openSession()) {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<User> query = builder.createQuery(User.class);
+            Root<User> root = query.from(User.class);
+            return session.createQuery(query.where(builder.equal(root.get("id"), id)))
+                    .getSingleResult();
+        } catch (Exception e) {
+            throw new DataProcessingException(
+                    "There was an error retrieving a user with id " + id, e);
         }
     }
 }
