@@ -43,12 +43,22 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<User> getAll() {
         try (Session session = sessionFactory.openSession()) {
-            CriteriaQuery<User> criteriaQuery
+            CriteriaQuery<User> query
                     = session.getCriteriaBuilder().createQuery(User.class);
-            criteriaQuery.from(User.class);
-            return session.createQuery(criteriaQuery).getResultList();
+            query.from(User.class);
+            return session.createQuery(query).getResultList();
         } catch (Exception e) {
             throw new DataProcessingException("There was an error retrieving all users", e);
+        }
+    }
+
+    @Override
+    public User get(Long id) {
+        try (Session session = sessionFactory.openSession()) {
+            return session.get(User.class, id);
+        } catch (Exception e) {
+            throw new DataProcessingException(
+                    "There was an error retrieving a user with id " + id, e);
         }
     }
 }
