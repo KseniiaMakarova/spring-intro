@@ -4,9 +4,7 @@ import com.intro.spring.dao.UserDao;
 import com.intro.spring.exception.DataProcessingException;
 import com.intro.spring.model.User;
 import java.util.List;
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -57,11 +55,7 @@ public class UserDaoImpl implements UserDao {
     @Override
     public User get(Long id) {
         try (Session session = sessionFactory.openSession()) {
-            CriteriaBuilder builder = session.getCriteriaBuilder();
-            CriteriaQuery<User> query = builder.createQuery(User.class);
-            Root<User> root = query.from(User.class);
-            return session.createQuery(query.where(builder.equal(root.get("id"), id)))
-                    .getSingleResult();
+            return session.get(User.class, id);
         } catch (Exception e) {
             throw new DataProcessingException(
                     "There was an error retrieving a user with id " + id, e);

@@ -3,8 +3,8 @@ package com.intro.spring.controller;
 import com.intro.spring.dto.UserResponseDto;
 import com.intro.spring.model.User;
 import com.intro.spring.service.UserService;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,12 +48,10 @@ public class UserController {
 
     @GetMapping("/")
     public List<UserResponseDto> getAll() {
-        List<User> users = userService.listUsers();
-        List<UserResponseDto> userResponseDtos = new ArrayList<>();
-        for (User user : users) {
-            userResponseDtos.add(getUserResponseDtoFromUser(user));
-        }
-        return userResponseDtos;
+        return userService.listUsers()
+                .stream()
+                .map((this::getUserResponseDtoFromUser))
+                .collect(Collectors.toList());
     }
 
     private UserResponseDto getUserResponseDtoFromUser(User user) {
